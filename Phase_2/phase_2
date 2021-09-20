@@ -1,4 +1,4 @@
-1. gdb bomb										//gdb debugger executes the assembly code
+  gdb bomb										//gdb debugger executes the assembly code
   (gdb) break phase_2									//breakpoint is set at phase 2 to avoid exploding of bomb when input is wrong
   (gdb) r result.txt									//write the string of phase_1 and save as result.txt file. run the program using result.txt
   Starting program: /home/yang/Desktop/ITS304 CS1/Assignment_1/bomb003/bomb result.txt	
@@ -187,8 +187,6 @@
   For remaining three input number, follow the same procedure as above. 
   
   Description:
-  Phase 2 is about giving a string. If the given input string is equal with the answer string, then bomb at phase 1 is defused. 
-  The string used for defusing phase 1 of bomb 003 is "Border relations with Canada have never been better." 
+  Phase 2 is about giving a set of 6 numbers. If the given input 6 numbers is equal with the answer 6 numbers, then bomb at phase 2 is defused. 
+  The numbers used for defusing phase 2 of bomb 003 are "0 1 1 2 3 5" (First 6 fibonacci series numbers).
   
-  
-
