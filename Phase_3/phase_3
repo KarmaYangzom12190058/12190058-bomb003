@@ -1,14 +1,73 @@
-Phase 3 is all about giving two integers and it checks whether the given two inputs are correct or not. If it is correct then the phase_3 bomb will be diffused or else it will explode.
+ gdb bomb										//gdb debugger executes the assembly code
+  (gdb) break phase_3									//breakpoint is set at phase 3 to avoid exploding of bomb when input is wrong
+  (gdb) r result.txt									//run the program using result.txt
+  Starting program: /home/yang/Desktop/ITS304 CS1/Assignment_1/bomb003/bomb result.txt	
+  Welcome to my fiendish little bomb. You have 6 phases with
+  which to blow yourself up. Have a nice day!
+  Phase 1 defused. How about the next one?
+  0 1 1 2 3 5										
+  That's number 2.  Keep going!
+  2 3											//input any 2 random numbers 
 
-//first of all: 
-//1. open gdb bomb 
-//2. set break-point ("b phase_3") 
-//3. run the phase_1.txt file 
-//4. input phase_2 numbers (first six fibonacci series) 
-//5. give some random inputs and,
-//6. open the dissemble to show assembly code in phase_3
+  Breakpoint 1, 0x0000000000400f15 in phase_3 ()
+  
+  (gdb) disas										//opens assembly file
+  Dump of assembler code for function phase_3:
+  => 0x0000000000400f15 <+0>:	sub    $0x18,%rsp
+     0x0000000000400f19 <+4>:	mov    %fs:0x28,%rax
+     0x0000000000400f22 <+13>:	mov    %rax,0x8(%rsp)
+     0x0000000000400f27 <+18>:	xor    %eax,%eax
+     0x0000000000400f29 <+20>:	lea    0x4(%rsp),%rcx
+     0x0000000000400f2e <+25>:	mov    %rsp,%rdx
+     0x0000000000400f31 <+28>:	mov    $0x4025af,%esi
+     0x0000000000400f36 <+33>:	callq  0x400bb0 <__isoc99_sscanf@plt>		//scan input
+     0x0000000000400f3b <+38>:	cmp    $0x1,%eax				//compares first input number
+     0x0000000000400f3e <+41>:	jg     0x400f45 <phase_3+48>
+     0x0000000000400f40 <+43>:	callq  0x40142a <explode_bomb>
+     0x0000000000400f45 <+48>:	cmpl   $0x7,(%rsp)				//compares first input number
+     0x0000000000400f49 <+52>:	ja     0x400f86 <phase_3+113>
+     0x0000000000400f4b <+54>:	mov    (%rsp),%eax
+     0x0000000000400f4e <+57>:	jmpq   *0x402420(,%rax,8)
+     0x0000000000400f55 <+64>:	mov    $0xc6,%eax
+     0x0000000000400f5a <+69>:	jmp    0x400f97 <phase_3+130>
+     0x0000000000400f5c <+71>:	mov    $0x31e,%eax
+     0x0000000000400f61 <+76>:	jmp    0x400f97 <phase_3+130>
+     0x0000000000400f63 <+78>:	mov    $0x299,%eax
+     0x0000000000400f68 <+83>:	jmp    0x400f97 <phase_3+130>
+     0x0000000000400f6a <+85>:	mov    $0x3a,%eax
+     --Type <RET> for more, q to quit, c to continue without paging--
+     0x0000000000400f6f <+90>:	jmp    0x400f97 <phase_3+130>
+     0x0000000000400f71 <+92>:	mov    $0x270,%eax
+     0x0000000000400f76 <+97>:	jmp    0x400f97 <phase_3+130>
+     0x0000000000400f78 <+99>:	mov    $0x10b,%eax
+     0x0000000000400f7d <+104>:	jmp    0x400f97 <phase_3+130>
+     0x0000000000400f7f <+106>:	mov    $0x80,%eax
+     0x0000000000400f84 <+111>:	jmp    0x400f97 <phase_3+130>
+     0x0000000000400f86 <+113>:	callq  0x40142a <explode_bomb>
+     0x0000000000400f8b <+118>:	mov    $0x0,%eax
+     0x0000000000400f90 <+123>:	jmp    0x400f97 <phase_3+130>
+     0x0000000000400f92 <+125>:	mov    $0x3f,%eax
+     0x0000000000400f97 <+130>:	cmp    0x4(%rsp),%eax
+     0x0000000000400f9b <+134>:	je     0x400fa2 <phase_3+141>
+     0x0000000000400f9d <+136>:	callq  0x40142a <explode_bomb>
+     0x0000000000400fa2 <+141>:	mov    0x8(%rsp),%rax
+     0x0000000000400fa7 <+146>:	xor    %fs:0x28,%rax
+     0x0000000000400fb0 <+155>:	je     0x400fb7 <phase_3+162>
+     0x0000000000400fb2 <+157>:	callq  0x400b00 <__stack_chk_fail@plt>
+     0x0000000000400fb7 <+162>:	add    $0x18,%rsp
+     0x0000000000400fbb <+166>:	retq   
+   End of assembler dump.
 
-Dump of assembler code for function phase_3:
+  (gdb) x/s 0x4025af								//takes two numbers as input
+  0x4025af:	"%d %d"
+  
+  From this code, the first number should be between 1 to 7.
+  In line 38 and 48, we can see that if the first number doesn't satisfy the conditions,then the bomb will explode. 
+  
+  (gdb) until * 0x0000000000400f3e						//to directly jump in line <+41>
+  0x0000000000400f3e in phase_3 ()
+  (gdb) disas
+  Dump of assembler code for function phase_3:
    0x0000000000400f15 <+0>:	sub    $0x18,%rsp
    0x0000000000400f19 <+4>:	mov    %fs:0x28,%rax
    0x0000000000400f22 <+13>:	mov    %rax,0x8(%rsp)
@@ -16,14 +75,14 @@ Dump of assembler code for function phase_3:
    0x0000000000400f29 <+20>:	lea    0x4(%rsp),%rcx
    0x0000000000400f2e <+25>:	mov    %rsp,%rdx
    0x0000000000400f31 <+28>:	mov    $0x4025af,%esi
-   0x0000000000400f36 <+33>:	call   0x400bb0 <__isoc99_sscanf@plt>  //fetches the two user input.let the input be(0 75)
-   0x0000000000400f3b <+38>:	cmp    $0x1,%eax                       //compare frist integer with the value of %eax 
-   0x0000000000400f3e <+41>:	jg     0x400f45 <phase_3+48>           //if frist integer is geater than the value stored in the %eax then it jumps to +48
-   0x0000000000400f40 <+43>:	call   0x40142a <explode_bomb>         //else bomb explodes
-   0x0000000000400f45 <+48>:	cmpl   $0x7,(%rsp)                     //compare 7 and %rsp
-   0x0000000000400f49 <+52>:	ja     0x400f86 <phase_3+113>          //if input is greater than 7,bomb explodes(+113)
-   0x0000000000400f4b <+54>:	mov    (%rsp),%eax                     
-   0x0000000000400f4e <+57>:	jmp    *0x402420(,%rax,8)
+   0x0000000000400f36 <+33>:	callq  0x400bb0 <__isoc99_sscanf@plt>
+   0x0000000000400f3b <+38>:	cmp    $0x1,%eax
+=> 0x0000000000400f3e <+41>:	jg     0x400f45 <phase_3+48>			//if the value at eax is greater, it jumps to line <+48>. if not, the bomb explodes
+   0x0000000000400f40 <+43>:	callq  0x40142a <explode_bomb>
+   0x0000000000400f45 <+48>:	cmpl   $0x7,(%rsp)
+   0x0000000000400f49 <+52>:	ja     0x400f86 <phase_3+113>
+   0x0000000000400f4b <+54>:	mov    (%rsp),%eax
+   0x0000000000400f4e <+57>:	jmpq   *0x402420(,%rax,8)
    0x0000000000400f55 <+64>:	mov    $0xc6,%eax
    0x0000000000400f5a <+69>:	jmp    0x400f97 <phase_3+130>
    0x0000000000400f5c <+71>:	mov    $0x31e,%eax
@@ -38,69 +97,197 @@ Dump of assembler code for function phase_3:
    0x0000000000400f7d <+104>:	jmp    0x400f97 <phase_3+130>
    0x0000000000400f7f <+106>:	mov    $0x80,%eax
    0x0000000000400f84 <+111>:	jmp    0x400f97 <phase_3+130>
-   0x0000000000400f86 <+113>:	call   0x40142a <explode_bomb>
+   0x0000000000400f86 <+113>:	callq  0x40142a <explode_bomb>
    0x0000000000400f8b <+118>:	mov    $0x0,%eax
    0x0000000000400f90 <+123>:	jmp    0x400f97 <phase_3+130>
    0x0000000000400f92 <+125>:	mov    $0x3f,%eax
    0x0000000000400f97 <+130>:	cmp    0x4(%rsp),%eax
    0x0000000000400f9b <+134>:	je     0x400fa2 <phase_3+141>
-   0x0000000000400f9d <+136>:	call   0x40142a <explode_bomb>
+   0x0000000000400f9d <+136>:	callq  0x40142a <explode_bomb>
    0x0000000000400fa2 <+141>:	mov    0x8(%rsp),%rax
    0x0000000000400fa7 <+146>:	xor    %fs:0x28,%rax
    0x0000000000400fb0 <+155>:	je     0x400fb7 <phase_3+162>
-   0x0000000000400fb2 <+157>:	call   0x400b00 <__stack_chk_fail@plt>
+   0x0000000000400fb2 <+157>:	callq  0x400b00 <__stack_chk_fail@plt>
    0x0000000000400fb7 <+162>:	add    $0x18,%rsp
---Type <RET> for more, q to quit, c to continue without paging--
-   0x0000000000400fbb <+166>:	ret    
-End of assembler dump.
+   0x0000000000400fbb <+166>:	retq   
+  End of assembler dump.
 
-(gdb) x/s 0x4025af    //from this line we know that it take two numbers as a input.
-0x4025af:	"%d %d"
+  (gdb) i r
+  rax            0x2                 2						//the value is 2
+  rbx            0x7fffffffdf58      140737488346968
+  rcx            0x0                 0
+  rdx            0x7fffffffde44      140737488346692
+  rsi            0x0                 0
+  rdi            0x7fffffffd7f0      140737488345072
+  rbp            0x0                 0x0
+  rsp            0x7fffffffde40      0x7fffffffde40
 
-(gdb) i r
-rax            0x3f                63           // from here we know that second number of 0 is 63
-rbx            0x4021e0            4202976
-rcx            0x0                 0
-rdx            0x41                65
-rsi            0x0                 0
-rdi            0x7fffffffd960      140737488345440
-rbp            0x0                 0x0
-rsp            0x7fffffffdfb0      0x7fffffffdfb0
-r8             0x1999999999999999  1844674407370955161
-r9             0x0                 0
-r10            0x7ffff7f59ac0      140737353456320
-r11            0x7ffff7f5a3c0      140737353458624
-r12            0x400c60            4197472
-r13            0x0                 0
-r14            0x0                 0
-r15            0x0                 0
-rip            0x400f97            0x400f97 <phase_3+130>
-eflags         0x297               [ CF PF AF SF IF ]
-cs             0x33                51
-ss             0x2b                43
-ds             0x0                 0
-es             0x0                 0
-fs             0x0                 0
-gs             0x0                 0
-k0             0x0                 0
-k1             0x0                 0
-k2             0x0                 0
-k3             0x0                 0
-k4             0x0                 0
-k5             0x0                 0
-k6             0x0                 0
-k7             0x0                 0
+  (gdb) ni
+0x0000000000400f45 in phase_3 ()
+(gdb) ni
+0x0000000000400f49 in phase_3 ()
+(gdb) disas
+Dump of assembler code for function phase_3:
+   0x0000000000400f15 <+0>:	sub    $0x18,%rsp
+   0x0000000000400f19 <+4>:	mov    %fs:0x28,%rax
+   0x0000000000400f22 <+13>:	mov    %rax,0x8(%rsp)
+   0x0000000000400f27 <+18>:	xor    %eax,%eax
+   0x0000000000400f29 <+20>:	lea    0x4(%rsp),%rcx
+   0x0000000000400f2e <+25>:	mov    %rsp,%rdx
+   0x0000000000400f31 <+28>:	mov    $0x4025af,%esi
+   0x0000000000400f36 <+33>:	callq  0x400bb0 <__isoc99_sscanf@plt>
+   0x0000000000400f3b <+38>:	cmp    $0x1,%eax
+   0x0000000000400f3e <+41>:	jg     0x400f45 <phase_3+48>
+   0x0000000000400f40 <+43>:	callq  0x40142a <explode_bomb>
+   0x0000000000400f45 <+48>:	cmpl   $0x7,(%rsp)				//value at rsp is compared with 7
+=> 0x0000000000400f49 <+52>:	ja     0x400f86 <phase_3+113>			//if the value at rsp is greater than 7,  the bomb explodes
+   0x0000000000400f4b <+54>:	mov    (%rsp),%eax
+   0x0000000000400f4e <+57>:	jmpq   *0x402420(,%rax,8)
+   0x0000000000400f55 <+64>:	mov    $0xc6,%eax
+   0x0000000000400f5a <+69>:	jmp    0x400f97 <phase_3+130>
+   0x0000000000400f5c <+71>:	mov    $0x31e,%eax
+   0x0000000000400f61 <+76>:	jmp    0x400f97 <phase_3+130>
+   0x0000000000400f63 <+78>:	mov    $0x299,%eax
+   0x0000000000400f68 <+83>:	jmp    0x400f97 <phase_3+130>
 
-output
-(gdb) run phase_1.txt   //string of phase_1 is saved inside the phase_1.txt file.
-Starting program: /home/gcit/Desktop/Assignment 1_2/Assignment 1/bomb003/bomb phase_1.txt
-Welcome to my fiendish little bomb. You have 6 phases with
-which to blow yourself up. Have a nice day!
-Phase 1 defused. How about the next one?
-0 1 1 2 3 5
-That's number 2.  Keep going!
-0 63
-Halfway there!
+   (gdb) i r
+   rax            0x2                 2
+   rbx            0x7fffffffdf58      140737488346968
+   rcx            0x0                 0
+   rdx            0x7fffffffde44      140737488346692
+   rsi            0x0                 0
+   rdi            0x7fffffffd7f0      140737488345072
+   rbp            0x0                 0x0
+   rsp            0x7fffffffde40      0x7fffffffde40
 
-possible inputs
-(0 63) (1 198) (2 789) (3 198) (4 58) (5 624) (6 267) (7 128)
+  (gdb) x/d 0x7fffffffde40						//value 	at rsp is less than 7 so bomb will not explode
+  0x7fffffffde40:	2
+  
+  Now, we know that the first input number should be in range of 1 to 7.
+  
+  (gdb) ni 2
+  0x0000000000400f4e in phase_3 ()
+  (gdb) disas
+  Dump of assembler code for function phase_3:
+   0x0000000000400f15 <+0>:	sub    $0x18,%rsp
+   0x0000000000400f19 <+4>:	mov    %fs:0x28,%rax
+   0x0000000000400f22 <+13>:	mov    %rax,0x8(%rsp)
+   0x0000000000400f27 <+18>:	xor    %eax,%eax
+   0x0000000000400f29 <+20>:	lea    0x4(%rsp),%rcx
+   0x0000000000400f2e <+25>:	mov    %rsp,%rdx
+   0x0000000000400f31 <+28>:	mov    $0x4025af,%esi
+   0x0000000000400f36 <+33>:	callq  0x400bb0 <__isoc99_sscanf@plt>
+   0x0000000000400f3b <+38>:	cmp    $0x1,%eax
+   0x0000000000400f3e <+41>:	jg     0x400f45 <phase_3+48>
+   0x0000000000400f40 <+43>:	callq  0x40142a <explode_bomb>
+   0x0000000000400f45 <+48>:	cmpl   $0x7,(%rsp)
+   0x0000000000400f49 <+52>:	ja     0x400f86 <phase_3+113>
+   0x0000000000400f4b <+54>:	mov    (%rsp),%eax				//move the value at rsp(2) to eax 
+=> 0x0000000000400f4e <+57>:	jmpq   *0x402420(,%rax,8)			//jumps directly to the absolute address
+   0x0000000000400f55 <+64>:	mov    $0xc6,%eax
+   0x0000000000400f5a <+69>:	jmp    0x400f97 <phase_3+130>
+   0x0000000000400f5c <+71>:	mov    $0x31e,%eax
+   0x0000000000400f61 <+76>:	jmp    0x400f97 <phase_3+130>
+
+   (gdb) ni
+   0x0000000000400f5c in phase_3 ()
+   (gdb) disas
+   Dump of assembler code for function phase_3:
+   0x0000000000400f15 <+0>:	sub    $0x18,%rsp
+   0x0000000000400f19 <+4>:	mov    %fs:0x28,%rax
+   0x0000000000400f22 <+13>:	mov    %rax,0x8(%rsp)
+   0x0000000000400f27 <+18>:	xor    %eax,%eax
+   0x0000000000400f29 <+20>:	lea    0x4(%rsp),%rcx
+   0x0000000000400f2e <+25>:	mov    %rsp,%rdx
+   0x0000000000400f31 <+28>:	mov    $0x4025af,%esi
+   0x0000000000400f36 <+33>:	callq  0x400bb0 <__isoc99_sscanf@plt>
+   0x0000000000400f3b <+38>:	cmp    $0x1,%eax
+   0x0000000000400f3e <+41>:	jg     0x400f45 <phase_3+48>
+   0x0000000000400f40 <+43>:	callq  0x40142a <explode_bomb>
+   0x0000000000400f45 <+48>:	cmpl   $0x7,(%rsp)
+   0x0000000000400f49 <+52>:	ja     0x400f86 <phase_3+113>
+   0x0000000000400f4b <+54>:	mov    (%rsp),%eax
+   0x0000000000400f4e <+57>:	jmpq   *0x402420(,%rax,8)
+   0x0000000000400f55 <+64>:	mov    $0xc6,%eax
+   0x0000000000400f5a <+69>:	jmp    0x400f97 <phase_3+130>
+=> 0x0000000000400f5c <+71>:	mov    $0x31e,%eax				//moves 0x31e to $eax
+   0x0000000000400f61 <+76>:	jmp    0x400f97 <phase_3+130>			//jumps to line <+130> after moving the values
+   0x0000000000400f63 <+78>:	mov    $0x299,%eax
+   0x0000000000400f68 <+83>:	jmp    0x400f97 <phase_3+130>
+   
+   //798 is the decimal equivalent of Ox31e and is being moved to $eax.
+   
+   (gdb) ni 2
+   0x0000000000400f97 in phase_3 ()
+   (gdb) disas
+   Dump of assembler code for function phase_3:
+   0x0000000000400f15 <+0>:	sub    $0x18,%rsp
+   0x0000000000400f19 <+4>:	mov    %fs:0x28,%rax
+   0x0000000000400f22 <+13>:	mov    %rax,0x8(%rsp)
+   0x0000000000400f27 <+18>:	xor    %eax,%eax
+   0x0000000000400f29 <+20>:	lea    0x4(%rsp),%rcx
+   0x0000000000400f2e <+25>:	mov    %rsp,%rdx
+   0x0000000000400f31 <+28>:	mov    $0x4025af,%esi
+   0x0000000000400f36 <+33>:	callq  0x400bb0 <__isoc99_sscanf@plt>
+   0x0000000000400f3b <+38>:	cmp    $0x1,%eax
+   0x0000000000400f3e <+41>:	jg     0x400f45 <phase_3+48>
+   0x0000000000400f40 <+43>:	callq  0x40142a <explode_bomb>
+   0x0000000000400f45 <+48>:	cmpl   $0x7,(%rsp)
+   0x0000000000400f49 <+52>:	ja     0x400f86 <phase_3+113>
+   0x0000000000400f4b <+54>:	mov    (%rsp),%eax
+   0x0000000000400f4e <+57>:	jmpq   *0x402420(,%rax,8)
+   0x0000000000400f55 <+64>:	mov    $0xc6,%eax
+   0x0000000000400f5a <+69>:	jmp    0x400f97 <phase_3+130>
+   0x0000000000400f5c <+71>:	mov    $0x31e,%eax
+   0x0000000000400f61 <+76>:	jmp    0x400f97 <phase_3+130>
+   0x0000000000400f63 <+78>:	mov    $0x299,%eax
+   0x0000000000400f68 <+83>:	jmp    0x400f97 <phase_3+130>
+   0x0000000000400f6a <+85>:	mov    $0x3a,%eax
+   0x0000000000400f6f <+90>:	jmp    0x400f97 <phase_3+130>
+   0x0000000000400f71 <+92>:	mov    $0x270,%eax
+   0x0000000000400f76 <+97>:	jmp    0x400f97 <phase_3+130>
+   0x0000000000400f78 <+99>:	mov    $0x10b,%eax
+   0x0000000000400f7d <+104>:	jmp    0x400f97 <phase_3+130>
+   0x0000000000400f7f <+106>:	mov    $0x80,%eax
+   0x0000000000400f84 <+111>:	jmp    0x400f97 <phase_3+130>
+   0x0000000000400f86 <+113>:	callq  0x40142a <explode_bomb>
+   0x0000000000400f8b <+118>:	mov    $0x0,%eax
+   0x0000000000400f90 <+123>:	jmp    0x400f97 <phase_3+130>
+   0x0000000000400f92 <+125>:	mov    $0x3f,%eax
+=> 0x0000000000400f97 <+130>:	cmp    0x4(%rsp),%eax				
+   0x0000000000400f9b <+134>:	je     0x400fa2 <phase_3+141>
+   0x0000000000400f9d <+136>:	callq  0x40142a <explode_bomb>
+   0x0000000000400fa2 <+141>:	mov    0x8(%rsp),%rax
+   0x0000000000400fa7 <+146>:	xor    %fs:0x28,%rax
+   0x0000000000400fb0 <+155>:	je     0x400fb7 <phase_3+162>
+   0x0000000000400fb2 <+157>:	callq  0x400b00 <__stack_chk_fail@plt>
+   0x0000000000400fb7 <+162>:	add    $0x18,%rsp
+   0x0000000000400fbb <+166>:	retq   
+   End of assembler dump.
+
+   (gdb) i r
+   rax            0x31e               798					//value of eax
+   rbx            0x7fffffffdf58      140737488346968
+   rcx            0x0                 0
+   rdx            0x7fffffffde44      140737488346692
+   rsi            0x0                 0
+   rdi            0x7fffffffd7f0      140737488345072
+   rbp            0x0                 0x0
+   rsp            0x7fffffffde40      0x7fffffffde40
+   
+   From this, we know that the first input number should be in range of 1 to 7 and second input number will be different for different first number.
+   In this case, the first number is 2 and the second number is 798.
+   
+   (gdb) run
+   Starting program: /home/yang/Desktop/ITS304 CS1/Assignment_1/bomb003/bomb result.txt
+   Welcome to my fiendish little bomb. You have 6 phases with
+   which to blow yourself up. Have a nice day!
+   Phase 1 defused. How about the next one?
+   0 1 1 2 3 5
+   That's number 2.  Keep going!
+   2 798
+   Halfway there!				
+   
+   Description:
+  Phase 3 is about giving a two numbers. The first number should be in range of 1 to 7 and for different first input number, there are different second number.
+  The numbers used for defusing phase 2 of bomb 003 are (1 198) (2 798) (3 665) (4 58) (5 624) (6 267) (7 128).
