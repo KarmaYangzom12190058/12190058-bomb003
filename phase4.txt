@@ -1,0 +1,100 @@
+ gdb bomb										//gdb debugger executes the assembly code
+ 
+  (gdb) break phase_4									//breakpoint is set at phase 4 to avoid exploding of bomb when input is wrong
+  
+  (gdb) r result.txt									//run the program using result.txt
+  Starting program: /home/yang/Desktop/ITS304 CS1/Assignment_1/bomb003/bomb result.txt
+  Welcome to my fiendish little bomb. You have 6 phases with
+  which to blow yourself up. Have a nice day!
+  Phase 1 defused. How about the next one?
+  0 1 1 2 3 5
+  That's number 2.  Keep going!
+  2 798
+  Halfway there!
+  2 5
+
+  Breakpoint 1, 0x0000000000400ffa in phase_4 ()
+
+  
+  (gdb) disas phase_4									//opens assembly file
+  Dump of assembler code for function phase_4:
+   0x0000000000400ffa <+0>:	sub    $0x18,%rsp					//creates strack frame
+   0x0000000000400ffe <+4>:	mov    %fs:0x28,%rax
+   0x0000000000401007 <+13>:	mov    %rax,0x8(%rsp)
+   0x000000000040100c <+18>:	xor    %eax,%eax
+   0x000000000040100e <+20>:	lea    0x4(%rsp),%rcx
+   0x0000000000401013 <+25>:	mov    %rsp,%rdx
+   0x0000000000401016 <+28>:	mov    $0x4025af,%esi					//format of answer: %d %d
+   0x000000000040101b <+33>:	callq  0x400bb0 <__isoc99_sscanf@plt>			//scan input
+   0x0000000000401020 <+38>:	cmp    $0x2,%eax					//check whether there is two input numbers
+   0x0000000000401023 <+41>:	jne    0x40102b <phase_4+49>				//If it's not equal to 2, then bomb explodes
+   0x0000000000401025 <+43>:	cmpl   $0xe,(%rsp)					//compares first input number and 0xe = 14
+   0x0000000000401029 <+47>:	jbe    0x401030 <phase_4+54>				//If first number <= 14, it jumps to line 54. If not, bomb explodes.
+   0x000000000040102b <+49>:	callq  0x40142a <explode_bomb>
+   0x0000000000401030 <+54>:	mov    $0xe,%edx					//%edx (3rd argument) = 14
+   0x0000000000401035 <+59>:	mov    $0x0,%esi					//%esi (2nd argument) = 0
+   0x000000000040103a <+64>:	mov    (%rsp),%edi					//%edi = 1 (first input number)
+   0x000000000040103d <+67>:	callq  0x400fbc <func4>					//function <func4> is being called
+   0x0000000000401042 <+72>:	cmp    $0x2,%eax					//compares return value of <func4> and 0x2
+   0x0000000000401045 <+75>:	jne    0x40104e <phase_4+84>				//If it's not equal to 2, then bomb explodes
+   0x0000000000401047 <+77>:	cmpl   $0x2,0x4(%rsp)					//check if second input number is 2
+   0x000000000040104c <+82>:	je     0x401053 <phase_4+89>
+   0x000000000040104e <+84>:	callq  0x40142a <explode_bomb>
+   0x0000000000401053 <+89>:	mov    0x8(%rsp),%rax
+   0x0000000000401058 <+94>:	xor    %fs:0x28,%rax
+   0x0000000000401061 <+103>:	je     0x401068 <phase_4+110>
+   0x0000000000401063 <+105>:	callq  0x400b00 <__stack_chk_fail@plt>
+   0x0000000000401068 <+110>:	add    $0x18,%rsp
+   0x000000000040106c <+114>:	retq   
+  End of assembler dump.
+  
+  (gdb) x/s 0x4025af									//takes two numbers as input
+  0x4025af:	"%d %d"
+  
+  From line 43, the first number should be between 0 to 14.
+  
+  (gdb) x/d $rsp
+  0x7fffffffde40:	2
+
+  (gdb) x/d $rsp+0x4
+  0x7fffffffde44:	5
+
+  First input number(2) is stored in $rsp and second input number(5) is stored in $rsp+0x4. 
+  
+  (gdb) u* 0x000000000040103d								//executes instructions until it reaches line 67
+  0x000000000040103d in phase_4 ()
+  
+  (gdb) si
+  0x0000000000400fbc in func4 ()
+
+  (gdb) disas 										//opens assembly code of function <func4>
+  Dump of assembler code for function func4:
+=> 0x0000000000400fbc <+0>:	sub    $0x8,%rsp					//creates stack frame
+   0x0000000000400fc0 <+4>:	mov    %edx,%eax					//eax = 14
+   0x0000000000400fc2 <+6>:	sub    %esi,%eax					//eax = eax - esi; eax = 14 - 0 = 14
+   0x0000000000400fc4 <+8>:	mov    %eax,%ecx					//ecx = 14
+   0x0000000000400fc6 <+10>:	shr    $0x1f,%ecx					//0x1f = 31; ecx = 14 >> 31; returns MSB ---> 0
+   0x0000000000400fc9 <+13>:	add    %ecx,%eax					//eax = eax + ecx; eax = 14 + 0 = 14
+   0x0000000000400fcb <+15>:	sar    %eax						//eax = eax >> 1; 14 >> 1 ---> same as eax/2
+   0x0000000000400fcd <+17>:	lea    (%rax,%rsi,1),%ecx				//ecx = rax + rsi; ecx = 7 + 0 = 7
+   0x0000000000400fd0 <+20>:	cmp    %edi,%ecx					//compares ecx (7) and first number
+   0x0000000000400fd2 <+22>:	jle    0x400fe0 <func4+36>				//if 7 <= first number, jump pass recursion call
+   0x0000000000400fd4 <+24>:	lea    -0x1(%rcx),%edx					//edx = rcx - 1; edx = 7 - 1 = 6 (value of rcx is decremented each time)
+   0x0000000000400fd7 <+27>:	callq  0x400fbc <func4>					//calls the function again
+   0x0000000000400fdc <+32>:	add    %eax,%eax					//eax = eax + eax (return value)
+   0x0000000000400fde <+34>:	jmp    0x400ff5 <func4+57>
+   0x0000000000400fe0 <+36>:	mov    $0x0,%eax					//eax = 0
+   0x0000000000400fe5 <+41>:	cmp    %edi,%ecx					//compares ecx (7) and first number
+   0x0000000000400fe7 <+43>:	jge    0x400ff5 <func4+57>				//if 7 >= edi (first number)
+   0x0000000000400fe9 <+45>:	lea    0x1(%rcx),%esi					//esi = 1 + rcx; esi = 1 + 7 = 8 (value of rcx is incremented each time)
+   0x0000000000400fec <+48>:	callq  0x400fbc <func4>					//calls the function again
+   0x0000000000400ff1 <+53>:	lea    0x1(%rax,%rax,1),%eax
+   0x0000000000400ff5 <+57>:	add    $0x8,%rsp					//returns back eax which has value 2
+   0x0000000000400ff9 <+61>:	retq   
+  End of assembler dump.
+
+  Description:
+  Phase 4 is about giving two input numbers as phase 3. The first number should be in range of 0 to 14 and involves recursion.
+  The second input number should be 2. Thus, the format for the answer is "x 2".
+  The numbers used for defusing phase 4 of bomb 003 are "4 2". 
+  
